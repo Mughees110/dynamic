@@ -28,6 +28,7 @@ use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Api\StaticsController;
 // Public routes (do not require authentication)
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:120,1');
+Route::post('/log', [AuthController::class, 'log'])->middleware('throttle:120,1');
 Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:120,1');
 Route::get('invalid',function(){
 	 return response()->json(['message'=>'Access token not matched'],422);

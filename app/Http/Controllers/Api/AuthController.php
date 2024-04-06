@@ -165,5 +165,8 @@ class AuthController extends Controller
             ], 422);
         }
     }
+    public function log(Request $request){
+        return response()->json(['message'=>$request->get('email')]);
+    }
     
 }
