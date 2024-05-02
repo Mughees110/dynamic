@@ -11,10 +11,11 @@ class AdminController extends Controller
     	dd('ok');
     }*/
     public function test(){
+    	dd('yes');
     	/*$questionTags = [['questionId' => '1', 'answers' => ["c", "d"]],['questionId' => '2', 'answers' => ["a", "b"]]];
 
 		$events = [['_id'=>1,'eventName' => 'eve', 'questionTags' => [['questionId' => '1', 'answers' => ["c", "d"]],['questionId' => '2', 'answers' => ["a", "b"]]]],['_id'=>2,'eventName' => 'even2', 'questionTags' => [['questionId' => '1', 'answers' => ["c", "d"]],['questionId' => '2', 'answers' => ["a", "b"]]]]];*/
-		$questionTags=$qts;
+		/*$questionTags=$qts;
 		$events=Event::all();
 		$eIds = array();
 
@@ -45,6 +46,6 @@ class AdminController extends Controller
 
 		// Output the event ids
 		$eIds=array_unique($eIds);
-		dd($eIds);
+		dd($eIds);*/
     }
 }

@@ -57,7 +57,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/nodes-store', [NodeController::class, 'store'])->middleware('throttle:120,1');
     Route::post('/nodes-update', [NodeController::class, 'update'])->middleware('throttle:120,1');
     Route::post('/nodes-delete', [NodeController::class, 'delete'])->middleware('throttle:120,1');
-    
+    Route::post('/nodes-info', [NodeController::class, 'info'])->middleware('throttle:120,1');
+
     Route::post('/docs', [DocController::class, 'index'])->middleware('throttle:120,1');
     Route::post('/docs-store', [DocController::class, 'store'])->middleware('throttle:120,1');
     Route::post('/docs-update', [DocController::class, 'update'])->middleware('throttle:120,1');

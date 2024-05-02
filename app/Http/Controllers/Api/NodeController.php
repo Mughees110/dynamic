@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Node;
+use App\Models\Form;
 use App\Models\Statics;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -149,5 +150,16 @@ class NodeController extends Controller
     	}
     	$node->delete();
     	return response()->json(['message'=>'deleted successfully']);
+    }
+    public function info(Request $request){
+        if(empty($request->json('nodeId'))){
+            return response()->json([
+                    'message' => 'All fields (nodeId) required',
+                ], 422);
+        }
+        $isNode=Node::where('parentId',$request->json('nodeId'))->exists();
+        $isForm=Form::where('nodeId',$request->json('nodeId'))->exists();
+        return response()->json(['isNodeBelow'=>$isNode,'isFormBelow'=>$isForm]);
+
     }
 }

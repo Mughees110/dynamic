@@ -5,13 +5,26 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Form;
+use App\Models\Node;
 use App\Models\Field;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 class FormController extends Controller
 {
     public function index(Request $request){
-    	$forms=Form::all();
+    	
+        if(empty($request->json('nodeId'))){
+            $forms=Form::all();
+            foreach ($forms as $key => $value) {
+                $value->setAttribute('node',Node::find($value->nodeId));
+            }
+        }
+        if(!empty($request->json('nodeId'))){
+            $forms=Form::where('nodeId',$request->json('nodeId'))->get();
+            foreach ($forms as $key => $value) {
+                $value->setAttribute('node',Node::find($value->nodeId));
+            }
+        }
     	return response()->json(['data'=>$forms]);
     }
     public function store(Request $request){
