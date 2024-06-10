@@ -19,7 +19,7 @@ class AnswerController extends Controller
                     'message' => 'All answers (formId userId) required',
                 ], 422);
     	}
-        $records=Record::where('userId',$request->json('userId'))->where('formId',$request->json('formId'))->select('date')->distinct()->get();
+        $records=Record::where('userId',$request->json('userId'))->where('formId',$request->json('formId'))->get();
         foreach ($records as $key => $value) {
             $answers=Answer::where('recordId',$value->id)->get();
             foreach ($answers as $key => $valueA) {
