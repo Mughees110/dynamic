@@ -39,6 +39,7 @@ class User extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        'accessArray'=>'array'
+        'accessArray'=>'array',
+        'preference'=>'array',
     ];
 }

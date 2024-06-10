@@ -38,6 +38,7 @@ class UserController extends Controller
             $user->address=$request->json('address');
             $user->companyId=$request->json('companyId');
             $user->accessArray=$request->json('accessArray');
+            $user->preference=$request->json('preference');
             $user->save();
 
             DB::commit();
@@ -99,6 +100,9 @@ class UserController extends Controller
             }
             if(!empty($request->json('accessArray'))){
                 $user->accessArray=$request->json('accessArray');
+            }
+            if(!empty($request->json('preference'))){
+                $user->preference=$request->json('preference');
             }
             $user->save();
 

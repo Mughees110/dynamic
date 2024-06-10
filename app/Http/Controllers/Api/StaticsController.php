@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Statics;
 use App\Models\Node;
 use App\Models\Doc;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Input;
@@ -27,8 +28,17 @@ class StaticsController extends Controller
     	return response()->json(['data'=>$statics]);
     }
     public function index2(Request $request){
-        
-        $statics=Statics::where('parentId',null)->get();
+
+        if(!empty($request->json('clientId'))){
+            $statics=Statics::where('parentId',null)->where('clientId',$request->json('clientId'))->get();
+        }
+        if(!empty($request->json('userId'))){
+            $user=User::find($request->json('userId'));
+            $statics=null;
+            if(!empty($request->json($user->preference))){
+                $statics=Statics::where('parentId',null)->whereIn('id',$user->preference)->get();
+            }
+        }
         
         return response()->json(['data'=>$statics]);
     }
@@ -44,6 +54,7 @@ class StaticsController extends Controller
             $statics=new Statics;
             $statics->name=$request->get('name');
             $statics->parentId=$request->get('parentId');
+            $statics->clientId=$request->get('clientId');
             $image=Input::file("file");
 	        $path='';
 	        if(!empty($image)){

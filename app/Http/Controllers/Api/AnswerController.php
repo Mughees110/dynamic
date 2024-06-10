@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Answer;
 use App\Models\Field;
+use App\Models\Record;
 use Input;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 class AnswerController extends Controller
 {
     public function index(Request $request){
@@ -17,10 +19,15 @@ class AnswerController extends Controller
                     'message' => 'All answers (formId userId) required',
                 ], 422);
     	}
-    	$answers=Answer::where('formId',$request->json('formId'))->where('userId',$request->json('userId'))->get();
-    	foreach ($answers as $key => $value) {
-    		$value->setAttribute('field',Field::find($value->fieldId));
-    	}
+        $records=Record::where('userId',$request->json('userId'))->where('formId',$request->json('formId'))->select('date')->distinct()->get();
+        foreach ($records as $key => $value) {
+            $answers=Answer::where('recordId',$value->id)->get();
+            foreach ($answers as $key => $valueA) {
+                $valueA->setAttribute('field',Field::find($valueA->fieldId));
+            }
+            $value->setAttribute('answers',$answers);
+        }
+    	/**/
     	return response()->json(['data'=>$answers]);
     }
     public function store(Request $request){
@@ -49,6 +56,11 @@ class AnswerController extends Controller
                         'message' => 'All answers (answers (array)) required',
                     ], 422);
                 }
+                $record=new Record;
+                $record->formId=$request->json('formId');
+                $record->date=Carbon::now()->toDateString();
+                $record->time=Carbon::now()->toTimeString();
+                $record->save();
                 foreach ($request->json('answersR') as $key => $a) {
                     $answer=new Answer;
                     $answer->formId=$request->json('formId');
@@ -56,6 +68,7 @@ class AnswerController extends Controller
                     $answer->userId=$request->json('userId');
                     $answer->answer=$a['answer'];
                     $answer->answers=$a['answers'];
+                    $answer->recordId=$record->id;
                     $answer->save();
                 }
                 DB::commit();

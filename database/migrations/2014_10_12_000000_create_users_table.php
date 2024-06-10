@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('endDateAccess')->nullable();
             $table->string('companyId')->nullable();
             $table->longText('accessArray')->nullable();
+            $table->longText('preference')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

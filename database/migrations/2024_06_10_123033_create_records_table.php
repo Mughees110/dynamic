@@ -11,14 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('answers', function (Blueprint $table) {
+        Schema::create('records', function (Blueprint $table) {
             $table->id();
-            $table->string('fieldId');
             $table->string('formId');
+            $table->date('date');
+            $table->time('time');
             $table->string('userId');
-            $table->longText('answer')->nullable();
-            $table->longText('answers')->nullable();
-            $table->string('recordId')->nullable();
             $table->timestamps();
         });
     }
@@ -28,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('answers');
+        Schema::dropIfExists('records');
     }
 };
