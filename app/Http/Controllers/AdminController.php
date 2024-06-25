@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use DB;
+use App\Models\Form;
 class AdminController extends Controller
 {
     /*public function test(){
@@ -11,6 +12,8 @@ class AdminController extends Controller
     	dd('ok');
     }*/
     public function test(){
+    	$foms=Form::all();
+    	return response()->json($foms);
     	DB::statement('ALTER TABLE statics ADD clientId VARCHAR(255);');
     	DB::statement('ALTER TABLE users ADD preference LONGTEXT;');
     	DB::statement('ALTER TABLE answers ADD recordId VARCHAR(255);');

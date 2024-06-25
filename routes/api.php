@@ -26,6 +26,9 @@ use App\Http\Controllers\Api\NodeController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Api\StaticsController;
+use App\Http\Controllers\Api\ReportController;
+use App\Http\Controllers\Api\ResultController;
+use App\Http\Controllers\Api\ParameterController;
 // Public routes (do not require authentication)
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:120,1');
 Route::post('/log', [AuthController::class, 'log'])->middleware('throttle:120,1');
@@ -80,5 +83,20 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/statics-update', [StaticsController::class, 'update'])->middleware('throttle:120,1');
     Route::post('/statics-delete', [StaticsController::class, 'delete'])->middleware('throttle:120,1');
     Route::post('/statics-info', [StaticsController::class, 'info'])->middleware('throttle:120,1');
+
+
+    Route::post('/reports', [ReportController::class, 'index'])->middleware('throttle:120,1');
+    Route::post('/reports-store', [ReportController::class, 'store'])->middleware('throttle:120,1');
+    Route::post('/reports-update', [ReportController::class, 'update'])->middleware('throttle:120,1');
+    Route::post('/reports-delete', [ReportController::class, 'delete'])->middleware('throttle:120,1');
+
+
+    Route::post('/parameters', [ParameterController::class, 'index'])->middleware('throttle:120,1');
+    Route::post('/parameters-store', [ParameterController::class, 'store'])->middleware('throttle:120,1');
+    Route::post('/parameters-update', [ParameterController::class, 'update'])->middleware('throttle:120,1');
+    Route::post('/parameters-delete', [ParameterController::class, 'delete'])->middleware('throttle:120,1');
+
+    Route::post('/results', [ResultController::class, 'index'])->middleware('throttle:120,1');
+    Route::post('/results-store', [ResultController::class, 'store'])->middleware('throttle:120,1');
 
 });
