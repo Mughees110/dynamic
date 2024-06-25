@@ -33,7 +33,8 @@ class NodeController extends Controller
             }
             $bool=true;
             $pId=$value->id;
-            while($bool==true){
+            $value->setAttribute('count','1');
+            /*while($bool==true){
                 $existsC=Node::where('parentId',$pId)->exists();
                 if($existsC==true){
                     $n=Node::where('parentId',$pId)->first();
@@ -43,11 +44,17 @@ class NodeController extends Controller
                     $bool=false;
                     $form=Form::where('nodeId',$pId)->first();
                     if($form->interval=="Weekly"){
+
+                    }
+                    if($form->interval=="Monthly"){
+                        
+                    }
+                    if($form->interval=="Daily"){
                         
                     }
 
                 }
-            }
+            }*/
     	}
     	return response()->json(['data'=>$nodes]);
     }
