@@ -12,7 +12,7 @@ class ParameterController extends Controller
     public function index(Request $request){
     	
         
-            $parameters=Parameter::all();
+            $parameters=Parameter::where('clientId',$request->json('clientId'))->get();
          
     	return response()->json(['data'=>$parameters]);
     }

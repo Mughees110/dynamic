@@ -35,7 +35,18 @@ class NodeController extends Controller
             $pId=$value->id;
             while($bool==true){
                 $existsC=Node::where('parentId',$pId)->exists();
+                if($existsC==true){
+                    $n=Node::where('parentId',$pId)->first();
+                    $pId=$n->id;
+                }
+                if($existsC==false){
+                    $bool=false;
+                    $form=Form::where('nodeId',$pId)->first();
+                    if($form->interval=="Weekly"){
+                        
+                    }
 
+                }
             }
     	}
     	return response()->json(['data'=>$nodes]);
