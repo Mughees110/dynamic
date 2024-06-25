@@ -31,6 +31,12 @@ class NodeController extends Controller
             if(!empty($value->static)){
                 $value->setAttribute('statics',Statics::find($value->static));
             }
+            $bool=true;
+            $pId=$value->id;
+            while($bool==true){
+                $existsC=Node::where('parentId',$pId)->exists();
+
+            }
     	}
     	return response()->json(['data'=>$nodes]);
     }

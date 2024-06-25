@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Report;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 class ReportController extends Controller
 {
      public function index(Request $request){
