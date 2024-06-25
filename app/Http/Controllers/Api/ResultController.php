@@ -11,9 +11,12 @@ class ResultController extends Controller
 {
      public function index(Request $request){
     	
-        
+        if(empty($request->json('month'))){
             $parameters=Result::where('userId',$request->json('userId'))->get();
-         
+        }
+         if(!empty($request->json('month'))){
+            $parameters=Result::where('userId',$request->json('userId'))->where('month',$request->json('month'))->get();
+        }
     	return response()->json(['data'=>$parameters]);
     }
     public function store(Request $request){
@@ -25,7 +28,7 @@ class ResultController extends Controller
             $form->month=$request->json('month');
             $form->value=$request->json('value');
             $form->userId=$request->json('userId');
-            $form->parameter=$request->json('parameterId');
+            $form->parameterId=$request->json('parameterId');
             $form->save();
 
             DB::commit();
