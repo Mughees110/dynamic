@@ -64,7 +64,7 @@ class NodeController extends Controller
 
                             $count = Record::where('userId',$request->json('userId'))->where('formId',$form->id)->whereBetween('date', [$startOfMonth, $endOfMonth])->count(); 
                             $r=$pcount-$count;
-                            $$value->setAttribute('count',$r);
+                            $value->setAttribute('count',$r);
                         }
                         if($form->interval=="Daily"){
                             $pcount=(int)$form->intervalValue;
@@ -72,7 +72,7 @@ class NodeController extends Controller
                             
                             $count = Record::where('userId',$request->json('userId'))->where('formId',$form->id)->where('date', $current)->count(); 
                             $r=$pcount-$count;
-                            $$value->setAttribute('count',$r);
+                            $value->setAttribute('count',$r);
                             
                         }
 
