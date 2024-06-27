@@ -60,6 +60,7 @@ class AnswerController extends Controller
                 $record->formId=$request->json('formId');
                 $record->date=Carbon::now()->toDateString();
                 $record->time=Carbon::now()->toTimeString();
+                $record->userId=$request->json('userId');
                 $record->save();
                 foreach ($request->json('answersR') as $key => $a) {
                     $answer=new Answer;
