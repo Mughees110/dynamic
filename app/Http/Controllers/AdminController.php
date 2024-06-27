@@ -13,6 +13,12 @@ class AdminController extends Controller
     }*/
     public function test(){
     	$foms=Form::all();
+    	foreach ($foms as $key => $value) {
+    		if($value->intervalValue=="test"){
+    			$value->intervalValue="1";
+    			$value->save();
+    		}
+    	}
     	return response()->json($foms);
     	DB::statement('ALTER TABLE statics ADD clientId VARCHAR(255);');
     	DB::statement('ALTER TABLE users ADD preference LONGTEXT;');

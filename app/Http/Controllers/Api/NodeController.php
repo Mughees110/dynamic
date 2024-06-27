@@ -7,9 +7,12 @@ use Illuminate\Http\Request;
 use App\Models\Node;
 use App\Models\Form;
 use App\Models\Statics;
+use App\Models\Record;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Input;
+use Carbon\Carbon;
+
 class NodeController extends Controller
 {
      public function index(Request $request){
@@ -33,28 +36,49 @@ class NodeController extends Controller
             }
             $bool=true;
             $pId=$value->id;
-            $value->setAttribute('count','1');
-            /*while($bool==true){
-                $existsC=Node::where('parentId',$pId)->exists();
-                if($existsC==true){
-                    $n=Node::where('parentId',$pId)->first();
-                    $pId=$n->id;
-                }
-                if($existsC==false){
-                    $bool=false;
-                    $form=Form::where('nodeId',$pId)->first();
-                    if($form->interval=="Weekly"){
+            //$value->setAttribute('count','1');
+            if(!empty($request->json('userId'))){
+                while($bool==true){
+                    $existsC=Node::where('parentId',$pId)->exists();
+                    if($existsC==true){
+                        $n=Node::where('parentId',$pId)->first();
+                        $pId=$n->id;
+                    }
+                    if($existsC==false){
+                        $bool=false;
+                        $form=Form::where('nodeId',$pId)->first();
+                        if($form->interval=="Weekly"){
+                            $pcount=(int)$form->intervalValue;
+                            $startOfWeek = Carbon::now()->startOfWeek()->toDateString();
+                            $endOfWeek = Carbon::now()->endOfWeek()->toDateString();
+
+                            $count = Record::where('userId',$request->json('userId'))->where('formId',$form->id)->whereBetween('date', [$startOfWeek, $endOfWeek])->count(); 
+                            $r=$pcount-$count;
+                            $$value->setAttribute('count',$r);
+
+                        }
+                        if($form->interval=="Monthly"){
+                            $pcount=(int)$form->intervalValue;
+                            $startOfMonth = Carbon::now()->startOfMonth()->toDateString();
+                            $endOfMonth = Carbon::now()->endOfMonth()->toDateString();
+
+                            $count = Record::where('userId',$request->json('userId'))->where('formId',$form->id)->whereBetween('date', [$startOfMonth, $endOfMonth])->count(); 
+                            $r=$pcount-$count;
+                            $$value->setAttribute('count',$r);
+                        }
+                        if($form->interval=="Daily"){
+                            $pcount=(int)$form->intervalValue;
+                            $current = Carbon::now()->toDateString();
+                            
+                            $count = Record::where('userId',$request->json('userId'))->where('formId',$form->id)->where('date', $current)->count(); 
+                            $r=$pcount-$count;
+                            $$value->setAttribute('count',$r);
+                            
+                        }
 
                     }
-                    if($form->interval=="Monthly"){
-                        
-                    }
-                    if($form->interval=="Daily"){
-                        
-                    }
-
                 }
-            }*/
+            }
     	}
     	return response()->json(['data'=>$nodes]);
     }
