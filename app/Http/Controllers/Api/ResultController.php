@@ -21,15 +21,19 @@ class ResultController extends Controller
     }
     public function store(Request $request){
         try {
-            
+            if(empty($request->json('array'))){
+            	return response()->json(['status'=>401,'message'=>'array is empty']);
+            }
             DB::beginTransaction();
 
-            $form=new Result;
-            $form->month=$request->json('month');
-            $form->value=$request->json('value');
-            $form->userId=$request->json('userId');
-            $form->parameterId=$request->json('parameterId');
-            $form->save();
+            foreach ($request->json('array') as $key => $value) {
+            	$form=new Result;
+	            $form->month=$value['month'];
+	            $form->value=$value['value'];
+	            $form->userId=$value['userId'];
+	            $form->parameterId=$value['parameterId'];
+	            $form->save();
+            }
 
             DB::commit();
             return response()->json(['message'=>'stored successfully','data'=>$form]);
