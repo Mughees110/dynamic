@@ -35,8 +35,11 @@ class StaticsController extends Controller
         if(!empty($request->json('userId'))){
             $user=User::find($request->json('userId'));
             $statics=null;
-            if(!empty($request->json($user->preference))){
+            if(!empty($user->preference)){
                 $statics=Statics::where('parentId',null)->whereIn('id',$user->preference)->get();
+            }
+            if(empty($user->preference)){
+                $statics=Statics::where('parentId',null)->get();
             }
         }
         
