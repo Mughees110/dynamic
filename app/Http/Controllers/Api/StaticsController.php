@@ -12,6 +12,7 @@ use App\Models\Form;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Input;
+use Carbon\Carbon;
 class StaticsController extends Controller
 {
     public function index(Request $request){
