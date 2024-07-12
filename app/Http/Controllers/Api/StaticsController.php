@@ -42,63 +42,65 @@ class StaticsController extends Controller
                 $statics=Statics::where('parentId',null)->get();
             }
         }
-        foreach ($statics as $static) {
-            $pId = $static->id;
-            
-            // Find the deepest child in the Statics hierarchy
-            while (Statics::where('parentId', $pId)->exists()) {
-                $pId = Statics::where('parentId', $pId)->first()->id;
-            }
-
-            $node = Node::where('static', $pId)->first();
-            if ($node && !empty($request->json('userId'))) {
-                $pId2 = $node->id;
-
-                // Find the deepest child in the Node hierarchy
-                while (Node::where('parentId', $pId2)->exists()) {
-                    $pId2 = Node::where('parentId', $pId2)->first()->id;
+        if($statics){
+            foreach ($statics as $static) {
+                $pId = $static->id;
+                
+                // Find the deepest child in the Statics hierarchy
+                while (Statics::where('parentId', $pId)->exists()) {
+                    $pId = Statics::where('parentId', $pId)->first()->id;
                 }
 
-                $form = Form::where('nodeId', $pId2)->first();
-                if ($form) {
-                    $pcount = (int)$form->intervalValue;
-                    $userId = $request->json('userId');
-                    $currentDate = Carbon::now();
+                $node = Node::where('static', $pId)->first();
+                if ($node && !empty($request->json('userId'))) {
+                    $pId2 = $node->id;
 
-                    switch ($form->interval) {
-                        case "Weekly":
-                            $startOfWeek = $currentDate->startOfWeek()->toDateString();
-                            $endOfWeek = $currentDate->endOfWeek()->toDateString();
-                            $count = Record::where('userId', $userId)
-                                           ->where('formId', $form->id)
-                                           ->whereBetween('date', [$startOfWeek, $endOfWeek])
-                                           ->count();
-                            break;
-
-                        case "Monthly":
-                            $startOfMonth = $currentDate->startOfMonth()->toDateString();
-                            $endOfMonth = $currentDate->endOfMonth()->toDateString();
-                            $count = Record::where('userId', $userId)
-                                           ->where('formId', $form->id)
-                                           ->whereBetween('date', [$startOfMonth, $endOfMonth])
-                                           ->count();
-                            break;
-
-                        case "Daily":
-                            $current = $currentDate->toDateString();
-                            $count = Record::where('userId', $userId)
-                                           ->where('formId', $form->id)
-                                           ->where('date', $current)
-                                           ->count();
-                            break;
-
-                        default:
-                            $count = 0;
-                            break;
+                    // Find the deepest child in the Node hierarchy
+                    while (Node::where('parentId', $pId2)->exists()) {
+                        $pId2 = Node::where('parentId', $pId2)->first()->id;
                     }
 
-                    $r = $pcount - $count;
-                    $static->setAttribute('count', $r);
+                    $form = Form::where('nodeId', $pId2)->first();
+                    if ($form) {
+                        $pcount = (int)$form->intervalValue;
+                        $userId = $request->json('userId');
+                        $currentDate = Carbon::now();
+
+                        switch ($form->interval) {
+                            case "Weekly":
+                                $startOfWeek = $currentDate->startOfWeek()->toDateString();
+                                $endOfWeek = $currentDate->endOfWeek()->toDateString();
+                                $count = Record::where('userId', $userId)
+                                               ->where('formId', $form->id)
+                                               ->whereBetween('date', [$startOfWeek, $endOfWeek])
+                                               ->count();
+                                break;
+
+                            case "Monthly":
+                                $startOfMonth = $currentDate->startOfMonth()->toDateString();
+                                $endOfMonth = $currentDate->endOfMonth()->toDateString();
+                                $count = Record::where('userId', $userId)
+                                               ->where('formId', $form->id)
+                                               ->whereBetween('date', [$startOfMonth, $endOfMonth])
+                                               ->count();
+                                break;
+
+                            case "Daily":
+                                $current = $currentDate->toDateString();
+                                $count = Record::where('userId', $userId)
+                                               ->where('formId', $form->id)
+                                               ->where('date', $current)
+                                               ->count();
+                                break;
+
+                            default:
+                                $count = 0;
+                                break;
+                        }
+
+                        $r = $pcount - $count;
+                        $static->setAttribute('count', $r);
+                    }
                 }
             }
         }
