@@ -34,7 +34,7 @@ class NodeController extends Controller
             if(!empty($value->static)){
                 $value->setAttribute('statics',Statics::find($value->static));
             }
-            $bool=true;
+            /*$bool=true;
             $pId=$value->id;
             //$value->setAttribute('count','1');
             if(!empty($request->json('userId'))){
@@ -80,7 +80,7 @@ class NodeController extends Controller
 
                     }
                 }
-            }
+            }*/
     	}
     	return response()->json(['data'=>$nodes]);
     }
