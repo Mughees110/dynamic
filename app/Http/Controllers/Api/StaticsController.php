@@ -28,6 +28,7 @@ class StaticsController extends Controller
     	return response()->json(['data'=>$statics]);
     }
     public function index2(Request $request){
+        $statics=null;
 
         if(!empty($request->json('clientId'))){
             $statics=Statics::where('parentId',null)->where('clientId',$request->json('clientId'))->get();
