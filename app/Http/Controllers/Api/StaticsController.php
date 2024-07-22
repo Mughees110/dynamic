@@ -28,24 +28,6 @@ class StaticsController extends Controller
     			$value->setAttribute('parent',Statics::find($value->parentId));
     		}
     	}
-    	return response()->json(['data'=>$statics]);
-    }
-    public function index2(Request $request){
-        $statics=null;
-
-        if(!empty($request->json('clientId'))){
-            $statics=Statics::where('parentId',null)->where('clientId',$request->json('clientId'))->get();
-        }
-        if(!empty($request->json('userId'))){
-            $user=User::find($request->json('userId'));
-            $statics=null;
-            if(!empty($user->preference)){
-                $statics=Statics::where('parentId',null)->whereIn('id',$user->preference)->get();
-            }
-            if(empty($user->preference)){
-                $statics=Statics::where('parentId',null)->get();
-            }
-        }
         if($statics){
             foreach ($statics as $static) {
                 $pId = $static->id;
@@ -108,6 +90,25 @@ class StaticsController extends Controller
                 }
             }
         }
+    	return response()->json(['data'=>$statics]);
+    }
+    public function index2(Request $request){
+        $statics=null;
+
+        if(!empty($request->json('clientId'))){
+            $statics=Statics::where('parentId',null)->where('clientId',$request->json('clientId'))->get();
+        }
+        if(!empty($request->json('userId'))){
+            $user=User::find($request->json('userId'));
+            $statics=null;
+            if(!empty($user->preference)){
+                $statics=Statics::where('parentId',null)->whereIn('id',$user->preference)->get();
+            }
+            if(empty($user->preference)){
+                $statics=Statics::where('parentId',null)->get();
+            }
+        }
+        
 
         return response()->json(['data'=>$statics]);
     }
