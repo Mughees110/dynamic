@@ -27,7 +27,13 @@ class ResultController extends Controller
             DB::beginTransaction();
 
             foreach ($request->json('array') as $key => $value) {
-            	$form=new Result;
+                $exists=Result::where('userId',$value['userId'])->where('parameterId',$value['parameterId'])->exists();
+                if($exists==false){
+                    $form=new Result;    
+                }
+            	if($exists==true){
+                    $form=Result::where('userId',$value['userId'])->where('parameterId',$value['parameterId'])->first();
+                }
 	            $form->month=$value['month'];
                 $form->year=$value['year'];
 	            $form->value=$value['value'];
