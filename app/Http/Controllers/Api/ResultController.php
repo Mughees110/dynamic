@@ -29,6 +29,7 @@ class ResultController extends Controller
             foreach ($request->json('array') as $key => $value) {
             	$form=new Result;
 	            $form->month=$value['month'];
+                $form->year=$value['year'];
 	            $form->value=$value['value'];
 	            $form->userId=$value['userId'];
 	            $form->parameterId=$value['parameterId'];

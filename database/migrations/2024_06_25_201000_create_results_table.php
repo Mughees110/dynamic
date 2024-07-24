@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('value')->nullable();
             $table->string('month')->nullable();
             $table->string('userId')->nullable();
+            $table->string('year')->nullable();
             $table->timestamps();
         });
     }

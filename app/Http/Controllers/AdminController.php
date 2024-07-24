@@ -12,6 +12,8 @@ class AdminController extends Controller
     	dd('ok');
     }*/
     public function test(){
+    	DB::statement('ALTER TABLE results ADD year VARCHAR(255);');
+    	dd('yes');
     	$foms=Form::all();
     	foreach ($foms as $key => $value) {
     		if($value->intervalValue=="test"){
