@@ -57,5 +57,18 @@ class ResultController extends Controller
     	
     	
     }
+    public function avg(Request $request){
+        $rs=Result::where('year',$request->json('year'))->get();
+        $rsc=Result::where('year',$request->json('year'))->count();
+        $sum=0;
+        foreach ($rs as $key => $value) {
+            $sum=$sum+$value->value;
+        }
+        if($rsc==0){
+            $rsc=1;
+        }
+        $avg=$sum/$rsc;
+        return response()->json(['status'=>200,'data'=>$avg]);
+    }
     
 }

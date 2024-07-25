@@ -99,4 +99,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/results', [ResultController::class, 'index'])->middleware('throttle:120,1');
     Route::post('/results-store', [ResultController::class, 'store'])->middleware('throttle:120,1');
 
+    Route::post('/results-avg', [ResultController::class, 'avg'])->middleware('throttle:120,1');
+
 });
