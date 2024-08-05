@@ -82,6 +82,9 @@ class StaticsController extends Controller
                     }
 
                     $r = $pcount - $count;
+                    if($r<0){
+                        $r=0;
+                    }
                     $value->setAttribute('count', $r);
                 }
             }
