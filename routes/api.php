@@ -29,6 +29,7 @@ use App\Http\Controllers\Api\StaticsController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\ResultController;
 use App\Http\Controllers\Api\ParameterController;
+use App\Http\Controllers\ParamController;
 // Public routes (do not require authentication)
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:120,1');
 Route::post('/log', [AuthController::class, 'log'])->middleware('throttle:120,1');
@@ -100,5 +101,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/results-store', [ResultController::class, 'store'])->middleware('throttle:120,1');
 
     Route::post('/results-avg', [ResultController::class, 'avg'])->middleware('throttle:120,1');
+
+        Route::post('/params', [ParamController::class, 'index'])->middleware('throttle:120,1');
+    Route::post('/params-store', [ParamController::class, 'store'])->middleware('throttle:120,1');
+    Route::post('/params-update', [ParamController::class, 'update'])->middleware('throttle:120,1');
+    Route::post('/params-delete', [ParamController::class, 'delete'])->middleware('throttle:120,1');
+
 
 });
