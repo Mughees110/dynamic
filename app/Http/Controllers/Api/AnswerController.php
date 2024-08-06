@@ -19,7 +19,12 @@ class AnswerController extends Controller
                     'message' => 'All answers (formId userId) required',
                 ], 422);
     	}
-        $records=Record::where('userId',$request->json('userId'))->where('formId',$request->json('formId'))->get();
+        if(empty($request->json('from'))&&empty($request->json('to'))){
+            $records=Record::where('userId',$request->json('userId'))->where('formId',$request->json('formId'))->get();
+        }
+        if(!empty($request->json('from'))&&!empty($request->json('to'))){
+            $records=Record::where('userId',$request->json('userId'))->where('formId',$request->json('formId'))->whereBetween('date',[$request->json('from'),$request->json('to')])->get();
+        }
         foreach ($records as $key => $value) {
             $answers=Answer::where('recordId',$value->id)->get();
             foreach ($answers as $key => $valueA) {
@@ -28,7 +33,7 @@ class AnswerController extends Controller
             $value->setAttribute('answers',$answers);
         }
     	/**/
-    	return response()->json(['data'=>$answers]);
+    	return response()->json(['data'=>$records]);
     }
     public function store(Request $request){
         try {
