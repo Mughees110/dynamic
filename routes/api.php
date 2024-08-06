@@ -29,7 +29,7 @@ use App\Http\Controllers\Api\StaticsController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\ResultController;
 use App\Http\Controllers\Api\ParameterController;
-use App\Http\Controllers\ParamController;
+use App\Http\Controllers\Api\ParamController;
 // Public routes (do not require authentication)
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:120,1');
 Route::post('/log', [AuthController::class, 'log'])->middleware('throttle:120,1');
