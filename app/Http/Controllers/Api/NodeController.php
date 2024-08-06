@@ -34,7 +34,7 @@ class NodeController extends Controller
             if(!empty($value->static)){
                 $value->setAttribute('statics',Statics::find($value->static));
             }
-            /*$bool=true;
+            $bool=true;
             $pId=$value->id;
             //$value->setAttribute('count','1');
             if(!empty($request->json('userId'))){
@@ -55,7 +55,10 @@ class NodeController extends Controller
 
                                 $count = Record::where('userId',$request->json('userId'))->where('formId',$form->id)->whereBetween('date', [$startOfWeek, $endOfWeek])->count(); 
                                 $r=$pcount-$count;
-                                $$value->setAttribute('count',$r);
+                                if($r<0){
+                                    $r=0;
+                                }
+                                $value->setAttribute('count',$r);
 
                             }
                             if($form->interval=="Monthly"){
@@ -65,6 +68,9 @@ class NodeController extends Controller
 
                                 $count = Record::where('userId',$request->json('userId'))->where('formId',$form->id)->whereBetween('date', [$startOfMonth, $endOfMonth])->count(); 
                                 $r=$pcount-$count;
+                                if($r<0){
+                                    $r=0;
+                                }
                                 $value->setAttribute('count',$r);
                             }
                             if($form->interval=="Daily"){
@@ -73,6 +79,9 @@ class NodeController extends Controller
                                 
                                 $count = Record::where('userId',$request->json('userId'))->where('formId',$form->id)->where('date', $current)->count(); 
                                 $r=$pcount-$count;
+                                if($r<0){
+                                    $r=0;
+                                }
                                 $value->setAttribute('count',$r);
                                 
                             }
@@ -80,7 +89,7 @@ class NodeController extends Controller
 
                     }
                 }
-            }*/
+            }
     	}
     	return response()->json(['data'=>$nodes]);
     }
