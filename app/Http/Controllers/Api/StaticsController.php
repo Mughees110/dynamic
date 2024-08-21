@@ -227,4 +227,85 @@ class StaticsController extends Controller
         return response()->json(['isStaticBelow'=>$isStatic,'isNodeBelow'=>$isNode,'isDocBelow'=>$isDoc]);
 
     }
+    public function copy(Request $request){
+        if(empty($request->json('staticId'))||empty($request->json('clientId'))){
+            return response()->json(['status'=>401,'message'=>'staticsId and clientId required']);
+        }
+
+        $pId = $request->json('staticId');
+
+        $sta=Statics::find($pId);
+        if($sta){
+            DB::beginTransaction();
+            
+            $newsta=new Statics;
+            $newsta->name=$sta->name;
+            $newsta->parentId=null;
+            $newsta->clientId=$request->json('clientId');
+            $newsta->file=$sta->file;
+            $newsta->save(); 
+
+            $npId=$newsta->id;
+                
+            // Find the deepest child in the Statics hierarchy
+            while (Statics::where('parentId', $pId)->exists()) {
+
+                $st=Statics::where('parentId',$pId)->first();
+
+                $newSt=new Statics;
+                $newSt->name=$st->name;
+                $newSt->parentId=$npId
+                $newSt->clientId=$request->json('clientId');
+                $newSt->file=$newSt->file;
+                $newSt->save();
+
+                $pId = Statics::where('parentId', $pId)->first()->id;
+                $npId=$newSt->id;
+            }
+
+            $node = Node::where('static', $pId)->first();
+            if($node){
+                $pId2=$node->id;
+                $nnode=new Node;
+                $nnode->name=$node->name;
+                $nnode->value=$node->value;
+                $nnode->file=$node->file;
+                $nnode->parentId=null;
+                $nnode->static=$npId;
+                $nnode->save();
+                $npId2=$nnode->id;
+
+                while (Node::where('parentId', $pId2)->exists()) {
+
+                    $nd=Node::where('parentId', $pId2)->first();
+                    $nnd=new Node;
+                    $nnd->name=$nd->name;
+                    $nnd->value=$nd->value;
+                    $nnd->file=$nd->file;
+                    $nnd->parentId=$npId2;
+                    $nnd->static=$npId2
+                    $nnd->save();
+
+                    $pId2 = Node::where('parentId', $pId2)->first()->id;
+                    $npId2=$nnd->id;
+                }
+
+                $form = Form::where('nodeId', $pId2)->first();
+                if($form){
+                    $nform=new Form;
+                    $nform->title=$form->title;
+                    $nform->description=$form->description;
+                    $nform->createdBy=null;
+                    $nform->nodeId=$npId2;
+                    $nform->intervalValue=$form->intervalValue;
+                    $nform->interval=$form->interval;
+                    $nform->save();
+                }
+
+            }
+            DB::commit();
+        }
+        
+        return response()->json(['status'=>200,'message'=>'stored successfully']);
+    }
 }

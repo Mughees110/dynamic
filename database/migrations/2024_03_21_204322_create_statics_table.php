@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name')->nullable();
             $table->string('parentId')->nullable();
+            $table->string('clientId')->nullable();
             $table->text('file')->nullable();
             $table->timestamps();
         });

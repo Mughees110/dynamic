@@ -84,6 +84,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/statics-update', [StaticsController::class, 'update'])->middleware('throttle:120,1');
     Route::post('/statics-delete', [StaticsController::class, 'delete'])->middleware('throttle:120,1');
     Route::post('/statics-info', [StaticsController::class, 'info'])->middleware('throttle:120,1');
+    Route::post('/copy-data', [StaticsController::class, 'copy'])->middleware('throttle:120,1');
 
 
     Route::post('/reports', [ReportController::class, 'index'])->middleware('throttle:120,1');
@@ -102,7 +103,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/results-avg', [ResultController::class, 'avg'])->middleware('throttle:120,1');
 
-        Route::post('/params', [ParamController::class, 'index'])->middleware('throttle:120,1');
+    Route::post('/params', [ParamController::class, 'index'])->middleware('throttle:120,1');
     Route::post('/params-store', [ParamController::class, 'store'])->middleware('throttle:120,1');
     Route::post('/params-update', [ParamController::class, 'update'])->middleware('throttle:120,1');
     Route::post('/params-delete', [ParamController::class, 'delete'])->middleware('throttle:120,1');
