@@ -237,7 +237,7 @@ class StaticsController extends Controller
         $sta=Statics::find($pId);
         if($sta){
             DB::beginTransaction();
-            
+
             $newsta=new Statics;
             $newsta->name=$sta->name;
             $newsta->parentId=null;
@@ -254,7 +254,7 @@ class StaticsController extends Controller
 
                 $newSt=new Statics;
                 $newSt->name=$st->name;
-                $newSt->parentId=$npId
+                $newSt->parentId=$npId;
                 $newSt->clientId=$request->json('clientId');
                 $newSt->file=$newSt->file;
                 $newSt->save();
