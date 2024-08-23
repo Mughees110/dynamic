@@ -283,7 +283,7 @@ class StaticsController extends Controller
                     $nnd->value=$nd->value;
                     $nnd->file=$nd->file;
                     $nnd->parentId=$npId2;
-                    $nnd->static=$npId2
+                    $nnd->static=$npId2;
                     $nnd->save();
 
                     $pId2 = Node::where('parentId', $pId2)->first()->id;
