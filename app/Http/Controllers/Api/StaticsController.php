@@ -319,7 +319,7 @@ class StaticsController extends Controller
         }
         DB::beginTransaction();
         try {
-            $staticsAll = Statics::where('destinationClientId', $request->json('destinationClientId'))
+            $staticsAll = Statics::where('clientId', $request->json('destinationClientId'))
                                  ->where('parentId', null)
                                  ->get();
 
