@@ -12,16 +12,8 @@ class AdminController extends Controller
     	dd('ok');
     }*/
     public function test(){
-    	DB::statement('ALTER TABLE results ADD year VARCHAR(255);');
-    	dd('yes');
-    	$foms=Form::all();
-    	foreach ($foms as $key => $value) {
-    		if($value->intervalValue=="test"){
-    			$value->intervalValue="1";
-    			$value->save();
-    		}
-    	}
-    	return response()->json($foms);
+    	DB::statement('ALTER TABLE companies ADD expiryDate date;');
+    	dd('hi');
     	DB::statement('ALTER TABLE statics ADD clientId VARCHAR(255);');
     	DB::statement('ALTER TABLE users ADD preference LONGTEXT;');
     	DB::statement('ALTER TABLE answers ADD recordId VARCHAR(255);');

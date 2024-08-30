@@ -27,6 +27,7 @@ class CompanyController extends Controller
             $company=new Company;
             $company->name=$request->json('name');
             $company->email=$request->json('email');
+            $company->expiryDate=$request->json('expiryDate');
             $company->save();
 
             DB::commit();
@@ -64,6 +65,9 @@ class CompanyController extends Controller
             }
             if(!empty($request->json('email'))){
                 $company->email=$request->json('email');
+            }
+            if(!empty($request->json('expiryDate'))){
+                $company->expiryDate=$request->json('expiryDate');
             }
             
             $company->save();
