@@ -328,6 +328,7 @@ class StaticsController extends Controller
             }
 
             DB::commit();
+            return response()->json(['status'=>200,'message'=>'Copied successfully']);
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;
