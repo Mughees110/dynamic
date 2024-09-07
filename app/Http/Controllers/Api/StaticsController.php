@@ -31,6 +31,105 @@ class StaticsController extends Controller
             // Attach the form count and IDs to the static
             $sta->setAttribute('form_count', $formCount);
             $sta->setAttribute('form_ids', $formIds);
+
+            $forms = Form::whereIn('id', $formIds)->get();
+            $sum = 0;
+
+            foreach ($forms as $key2 => $form) {
+                $interval = $form->interval;
+                $intervalValue = $form->intervalValue;
+                $creationDate = Carbon::parse($form->created_at)->startOfDay(); // Parse form creation date
+
+                $expectedOccurrences = 0; // Total expected occurrences since form creation
+                $diff = 0; // Missing occurrences
+
+                // Retrieve all the user's records for this form, grouped by date
+                $records = Record::where('userId', $request->json('userId'))
+                                ->where('formId', $form->id)
+                                ->select('created_at')
+                                ->get()
+                                ->groupBy(function($record) {
+                                    return Carbon::parse($record->created_at)->startOfDay()->toDateString();
+                                });
+
+                // Calculate occurrences based on the interval
+                if ($interval == "daily") {
+                    $daysPassed = Carbon::now()->diffInDays($creationDate);
+
+                    for ($i = 0; $i <= $daysPassed; $i++) {
+                        $checkDate = $creationDate->copy()->addDays($i);
+                        if (!$records->has($checkDate->toDateString())) {
+                            $diff++; // Increment missing count if no record exists for this day
+                        }
+                    }
+                } elseif ($interval == "weekly") {
+                    $weeksPassed = Carbon::now()->diffInWeeks($creationDate);
+
+                    for ($i = 0; $i <= $weeksPassed; $i++) {
+                        $checkDate = $creationDate->copy()->addWeeks($i)->startOfWeek();
+                        $found = $records->filter(function ($record, $key) use ($checkDate) {
+                            return Carbon::parse($key)->between($checkDate, $checkDate->copy()->endOfWeek());
+                        });
+                        if ($found->isEmpty()) {
+                            $diff++; // Increment missing count if no record exists for this week
+                        }
+                    }
+                } elseif ($interval == "biweekly") {
+                    $weeksPassed = Carbon::now()->diffInWeeks($creationDate);
+
+                    for ($i = 0; $i <= $weeksPassed; $i += 2) {
+                        $checkDate = $creationDate->copy()->addWeeks($i)->startOfWeek();
+                        $found = $records->filter(function ($record, $key) use ($checkDate) {
+                            return Carbon::parse($key)->between($checkDate, $checkDate->copy()->addWeeks(1)->endOfWeek());
+                        });
+                        if ($found->isEmpty()) {
+                            $diff++; // Increment missing count if no record exists for this biweekly period
+                        }
+                    }
+                } elseif ($interval == "monthly") {
+                    $monthsPassed = Carbon::now()->diffInMonths($creationDate);
+
+                    for ($i = 0; $i <= $monthsPassed; $i++) {
+                        $checkDate = $creationDate->copy()->addMonths($i)->startOfMonth();
+                        $found = $records->filter(function ($record, $key) use ($checkDate) {
+                            return Carbon::parse($key)->between($checkDate, $checkDate->copy()->endOfMonth());
+                        });
+                        if ($found->isEmpty()) {
+                            $diff++; // Increment missing count if no record exists for this month
+                        }
+                    }
+                } elseif ($interval == "quarterly") {
+                    $monthsPassed = Carbon::now()->diffInMonths($creationDate);
+
+                    for ($i = 0; $i <= $monthsPassed; $i += 6) {
+                        $checkDate = $creationDate->copy()->addMonths($i)->startOfMonth();
+                        $found = $records->filter(function ($record, $key) use ($checkDate) {
+                            return Carbon::parse($key)->between($checkDate, $checkDate->copy()->addMonths(5)->endOfMonth());
+                        });
+                        if ($found->isEmpty()) {
+                            $diff++; // Increment missing count if no record exists for this quarter
+                        }
+                    }
+                } elseif ($interval == "yearly") {
+                    $yearsPassed = Carbon::now()->diffInYears($creationDate);
+
+                    for ($i = 0; $i <= $yearsPassed; $i++) {
+                        $checkDate = $creationDate->copy()->addYears($i)->startOfYear();
+                        $found = $records->filter(function ($record, $key) use ($checkDate) {
+                            return Carbon::parse($key)->between($checkDate, $checkDate->copy()->endOfYear());
+                        });
+                        if ($found->isEmpty()) {
+                            $diff++; // Increment missing count if no record exists for this year
+                        }
+                    }
+                }
+
+                // Add the missing count to the total sum
+                $sum += $diff;
+            }
+
+            // Attach the total to the static object
+            $sta->setAttribute('count', $sum);
         }
 
     	return response()->json(['data'=>$statics]);
