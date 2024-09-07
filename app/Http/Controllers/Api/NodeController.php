@@ -34,62 +34,11 @@ class NodeController extends Controller
             if(!empty($value->static)){
                 $value->setAttribute('statics',Statics::find($value->static));
             }
-            $bool=true;
-            $pId=$value->id;
-            //$value->setAttribute('count','1');
-            if(!empty($request->json('userId'))){
-                while($bool==true){
-                    $existsC=Node::where('parentId',$pId)->exists();
-                    if($existsC==true){
-                        $n=Node::where('parentId',$pId)->first();
-                        $pId=$n->id;
-                    }
-                    if($existsC==false){
-                        $bool=false;
-                        $form=Form::where('nodeId',$pId)->first();
-                        if($form){
-                            if($form->interval=="Weekly"){
-                                $pcount=(int)$form->intervalValue;
-                                $startOfWeek = Carbon::now()->startOfWeek()->toDateString();
-                                $endOfWeek = Carbon::now()->endOfWeek()->toDateString();
+            list($formCount, $formIds) = $this->countFormsForNode($node->id);
 
-                                $count = Record::where('userId',$request->json('userId'))->where('formId',$form->id)->whereBetween('date', [$startOfWeek, $endOfWeek])->count(); 
-                                $r=$pcount-$count;
-                                if($r<0){
-                                    $r=0;
-                                }
-                                $value->setAttribute('count',$r);
-
-                            }
-                            if($form->interval=="Monthly"){
-                                $pcount=(int)$form->intervalValue;
-                                $startOfMonth = Carbon::now()->startOfMonth()->toDateString();
-                                $endOfMonth = Carbon::now()->endOfMonth()->toDateString();
-
-                                $count = Record::where('userId',$request->json('userId'))->where('formId',$form->id)->whereBetween('date', [$startOfMonth, $endOfMonth])->count(); 
-                                $r=$pcount-$count;
-                                if($r<0){
-                                    $r=0;
-                                }
-                                $value->setAttribute('count',$r);
-                            }
-                            if($form->interval=="Daily"){
-                                $pcount=(int)$form->intervalValue;
-                                $current = Carbon::now()->toDateString();
-                                
-                                $count = Record::where('userId',$request->json('userId'))->where('formId',$form->id)->where('date', $current)->count(); 
-                                $r=$pcount-$count;
-                                if($r<0){
-                                    $r=0;
-                                }
-                                $value->setAttribute('count',$r);
-                                
-                            }
-                        }
-
-                    }
-                }
-            }
+            // Attach the form count and IDs to the node
+            $value->setAttribute('form_count', $formCount);
+            $value->setAttribute('form_ids', $formIds);
     	}
     	return response()->json(['data'=>$nodes]);
     }
@@ -220,5 +169,46 @@ class NodeController extends Controller
         $isForm=Form::where('nodeId',$request->json('nodeId'))->exists();
         return response()->json(['isNodeBelow'=>$isNode,'isFormBelow'=>$isForm]);
 
+    }
+
+    private function countFormsForNode($nodeId)
+    {
+        $formCount = 0;
+        $formIds = [];
+
+        // Count forms for the current node and gather form IDs
+        $nodeForms = Form::where('nodeId', $nodeId)->get();
+        $formCount += $nodeForms->count();
+        $formIds = array_merge($formIds, $nodeForms->pluck('id')->toArray());
+
+        // Recursively count forms in child nodes
+        list($childFormCount, $childFormIds) = $this->countFormsInNodeChildren($nodeId);
+        $formCount += $childFormCount;
+        $formIds = array_merge($formIds, $childFormIds);
+
+        return [$formCount, $formIds];
+    }
+
+    private function countFormsInNodeChildren($parentId)
+    {
+        $formCount = 0;
+        $formIds = [];
+
+        // Get all child nodes of the given parent node
+        $children = Node::where('parentId', $parentId)->get();
+
+        foreach ($children as $child) {
+            // Count forms for this child node and gather form IDs
+            $childForms = Form::where('nodeId', $child->id)->get();
+            $formCount += $childForms->count();
+            $formIds = array_merge($formIds, $childForms->pluck('id')->toArray());
+
+            // Recursively count forms in child nodes
+            list($grandchildFormCount, $grandchildFormIds) = $this->countFormsInNodeChildren($child->id);
+            $formCount += $grandchildFormCount;
+            $formIds = array_merge($formIds, $grandchildFormIds);
+        }
+
+        return [$formCount, $formIds];
     }
 }
