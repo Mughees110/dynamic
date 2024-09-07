@@ -54,7 +54,7 @@ class StaticsController extends Controller
                                 });
 
                 // Calculate occurrences based on the interval
-                if ($interval == "daily") {
+                if ($interval == "Daily") {
                     $daysPassed = Carbon::now()->diffInDays($creationDate);
 
                     for ($i = 0; $i <= $daysPassed; $i++) {
@@ -63,7 +63,7 @@ class StaticsController extends Controller
                             $diff++; // Increment missing count if no record exists for this day
                         }
                     }
-                } elseif ($interval == "weekly") {
+                } elseif ($interval == "Weekly") {
                     $weeksPassed = Carbon::now()->diffInWeeks($creationDate);
 
                     for ($i = 0; $i <= $weeksPassed; $i++) {
@@ -75,7 +75,7 @@ class StaticsController extends Controller
                             $diff++; // Increment missing count if no record exists for this week
                         }
                     }
-                } elseif ($interval == "biweekly") {
+                } elseif ($interval == "Biweekly") {
                     $weeksPassed = Carbon::now()->diffInWeeks($creationDate);
 
                     for ($i = 0; $i <= $weeksPassed; $i += 2) {
@@ -87,7 +87,7 @@ class StaticsController extends Controller
                             $diff++; // Increment missing count if no record exists for this biweekly period
                         }
                     }
-                } elseif ($interval == "monthly") {
+                } elseif ($interval == "Monthly") {
                     $monthsPassed = Carbon::now()->diffInMonths($creationDate);
 
                     for ($i = 0; $i <= $monthsPassed; $i++) {
@@ -99,7 +99,7 @@ class StaticsController extends Controller
                             $diff++; // Increment missing count if no record exists for this month
                         }
                     }
-                } elseif ($interval == "quarterly") {
+                } elseif ($interval == "Quarterly") {
                     $monthsPassed = Carbon::now()->diffInMonths($creationDate);
 
                     for ($i = 0; $i <= $monthsPassed; $i += 6) {
@@ -111,7 +111,7 @@ class StaticsController extends Controller
                             $diff++; // Increment missing count if no record exists for this quarter
                         }
                     }
-                } elseif ($interval == "yearly") {
+                } elseif ($interval == "Yearly") {
                     $yearsPassed = Carbon::now()->diffInYears($creationDate);
 
                     for ($i = 0; $i <= $yearsPassed; $i++) {
