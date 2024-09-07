@@ -24,72 +24,14 @@ class StaticsController extends Controller
     	if(!empty($request->json('parentId'))){
     		$statics=Statics::where('parentId',$request->json('parentId'))->get();
     	}
-    	foreach ($statics as $key => $value) {
-    		if(!empty($value->parentId)){
-    			$value->setAttribute('parent',Statics::find($value->parentId));
-    		}
-            $pId = $value->id;
-                
-            // Find the deepest child in the Statics hierarchy
-            while (Statics::where('parentId', $pId)->exists()) {
-                $pId = Statics::where('parentId', $pId)->first()->id;
-            }
+    	
+        foreach ($statics as $key => $sta) {
+            list($formCount, $formIds) = $this->countFormsForStatic($sta->id);
 
-            $node = Node::where('static', $pId)->first();
-            if ($node && !empty($request->json('userId'))) {
-                $pId2 = $node->id;
-
-                // Find the deepest child in the Node hierarchy
-                while (Node::where('parentId', $pId2)->exists()) {
-                    $pId2 = Node::where('parentId', $pId2)->first()->id;
-                }
-
-                $form = Form::where('nodeId', $pId2)->first();
-                if ($form) {
-                    $pcount = (int)$form->intervalValue;
-                    $userId = $request->json('userId');
-                    $currentDate = Carbon::now();
-
-                    switch ($form->interval) {
-                        case "Weekly":
-                            $startOfWeek = $currentDate->startOfWeek()->toDateString();
-                            $endOfWeek = $currentDate->endOfWeek()->toDateString();
-                            $count = Record::where('userId', $userId)
-                                           ->where('formId', $form->id)
-                                           ->whereBetween('date', [$startOfWeek, $endOfWeek])
-                                           ->count();
-                            break;
-
-                        case "Monthly":
-                            $startOfMonth = $currentDate->startOfMonth()->toDateString();
-                            $endOfMonth = $currentDate->endOfMonth()->toDateString();
-                            $count = Record::where('userId', $userId)
-                                           ->where('formId', $form->id)
-                                           ->whereBetween('date', [$startOfMonth, $endOfMonth])
-                                           ->count();
-                            break;
-
-                        case "Daily":
-                            $current = $currentDate->toDateString();
-                            $count = Record::where('userId', $userId)
-                                           ->where('formId', $form->id)
-                                           ->where('date', $current)
-                                           ->count();
-                            break;
-
-                        default:
-                            $count = 0;
-                            break;
-                    }
-
-                    $r = $pcount - $count;
-                    if($r<0){
-                        $r=0;
-                    }
-                    $value->setAttribute('count', $r);
-                }
-            }
-    	}
+            // Attach the form count and IDs to the static
+            $sta->setAttribute('form_count', $formCount);
+            $sta->setAttribute('form_ids', $formIds);
+        }
 
     	return response()->json(['data'=>$statics]);
     }
@@ -449,6 +391,56 @@ class StaticsController extends Controller
             }
         }
     }
+
+    private function countFormsForStatic($staticId)
+    {
+        $formCount = 0;
+        $formIds = [];
+
+        // Get all nodes associated with this static
+        $nodes = Node::where('static', $staticId)->get();
+
+        foreach ($nodes as $node) {
+            // Count forms for each node and gather form IDs
+            $nodeForms = Form::where('nodeId', $node->id)->get();
+            $formCount += $nodeForms->count();
+            $formIds = array_merge($formIds, $nodeForms->pluck('id')->toArray());
+
+            // Recursively count forms in child nodes
+            list($childFormCount, $childFormIds) = $this->countFormsInNodeChildren($node->id);
+            $formCount += $childFormCount;
+            $formIds = array_merge($formIds, $childFormIds);
+        }
+
+        return [$formCount, $formIds];
+    }
+
+    private function countFormsInNodeChildren($parentId)
+    {
+        $formCount = 0;
+        $formIds = [];
+
+        // Get all child nodes of the given parent node
+        $children = Node::where('parentId', $parentId)->get();
+
+        foreach ($children as $child) {
+            // Count forms for this child node and gather form IDs
+            $childForms = Form::where('nodeId', $child->id)->get();
+            $formCount += $childForms->count();
+            $formIds = array_merge($formIds, $childForms->pluck('id')->toArray());
+
+            // Recursively count forms in child nodes
+            list($grandchildFormCount, $grandchildFormIds) = $this->countFormsInNodeChildren($child->id);
+            $formCount += $grandchildFormCount;
+            $formIds = array_merge($formIds, $grandchildFormIds);
+        }
+
+        return [$formCount, $formIds];
+    }
+
+
+
+
 
 
 }
