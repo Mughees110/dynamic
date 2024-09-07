@@ -34,7 +34,7 @@ class NodeController extends Controller
             if(!empty($value->static)){
                 $value->setAttribute('statics',Statics::find($value->static));
             }
-            list($formCount, $formIds) = $this->countFormsForNode($node->id);
+            list($formCount, $formIds) = $this->countFormsForNode($value->id);
 
             // Attach the form count and IDs to the node
             $value->setAttribute('form_count', $formCount);
