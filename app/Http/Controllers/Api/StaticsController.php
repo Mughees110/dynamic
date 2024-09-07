@@ -33,7 +33,7 @@ class StaticsController extends Controller
             $sta->setAttribute('form_ids', $formIds);
 
             $forms = Form::whereIn('id', $formIds)->get();
-            $sta->setAttribute('forms',$forms);
+            
             $sum = 0;
 
             foreach ($forms as $key2 => $form) {
