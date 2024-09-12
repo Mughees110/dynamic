@@ -137,7 +137,7 @@ class NodeController extends Controller
             }
 
             // Attach the total to the static object
-            $sta->setAttribute('count', $sum);
+            $value->setAttribute('count', $sum);
     	}
     	return response()->json(['data'=>$nodes]);
     }
