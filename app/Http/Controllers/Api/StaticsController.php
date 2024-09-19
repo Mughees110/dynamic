@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Models\Form;
 use App\Models\Field;
 use App\Models\Record;
+use App\Models\Read;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Input;
@@ -131,6 +132,16 @@ class StaticsController extends Controller
 
             // Attach the total to the static object
             $sta->setAttribute('count', $sum);
+
+            $rc=0;
+            $docs=Doc::where('static',$sta->id)->get();
+            foreach ($docs as $keydd => $valuedd) {
+                $exists=Read::where('docId',$valuedd->docId)->where('userId',$request->json('userId'))->exists();
+                if($exists==false){
+                    $rc=$rc+1;
+                }
+            }
+            $sta->setAttribute('docCount',$rc);
         }
 
     	return response()->json(['data'=>$statics]);

@@ -7,8 +7,11 @@ use Illuminate\Http\Request;
 use App\Models\Form;
 use App\Models\Node;
 use App\Models\Field;
+use App\Models\Record;
+use App\Models\Read;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 class FormController extends Controller
 {
     public function index(Request $request){
@@ -23,6 +26,100 @@ class FormController extends Controller
             $forms=Form::where('nodeId',$request->json('nodeId'))->get();
             foreach ($forms as $key => $value) {
                 $value->setAttribute('node',Node::find($value->nodeId));
+            }
+        }
+        if(!empty($request->json('userId'))){
+            foreach ($forms as $key2 => $form) {
+                $interval = $form->interval;
+                $intervalValue = $form->intervalValue;
+                $creationDate = Carbon::parse($form->created_at)->startOfDay(); // Parse form creation date
+
+                $expectedOccurrences = 0; // Total expected occurrences since form creation
+                $diff = 0; // Missing occurrences
+
+                // Retrieve all the user's records for this form, grouped by date
+                $records = Record::where('userId', $request->json('userId'))
+                                ->where('formId', $form->id)
+                                ->select('created_at')
+                                ->get()
+                                ->groupBy(function($record) {
+                                    return Carbon::parse($record->created_at)->startOfDay()->toDateString();
+                                });
+
+                // Calculate occurrences based on the interval
+                if ($interval == "Daily") {
+                    $daysPassed = Carbon::now()->diffInDays($creationDate);
+
+                    for ($i = 0; $i <= $daysPassed; $i++) {
+                        $checkDate = $creationDate->copy()->addDays($i);
+                        if (!$records->has($checkDate->toDateString())) {
+                            $diff++; // Increment missing count if no record exists for this day
+                        }
+                    }
+                } elseif ($interval == "Weekly") {
+                    $weeksPassed = Carbon::now()->diffInWeeks($creationDate);
+
+                    for ($i = 0; $i <= $weeksPassed; $i++) {
+                        $checkDate = $creationDate->copy()->addWeeks($i)->startOfWeek();
+                        $found = $records->filter(function ($record, $key) use ($checkDate) {
+                            return Carbon::parse($key)->between($checkDate, $checkDate->copy()->endOfWeek());
+                        });
+                        if ($found->isEmpty()) {
+                            $diff++; // Increment missing count if no record exists for this week
+                        }
+                    }
+                } elseif ($interval == "Biweekly") {
+                    $weeksPassed = Carbon::now()->diffInWeeks($creationDate);
+
+                    for ($i = 0; $i <= $weeksPassed; $i += 2) {
+                        $checkDate = $creationDate->copy()->addWeeks($i)->startOfWeek();
+                        $found = $records->filter(function ($record, $key) use ($checkDate) {
+                            return Carbon::parse($key)->between($checkDate, $checkDate->copy()->addWeeks(1)->endOfWeek());
+                        });
+                        if ($found->isEmpty()) {
+                            $diff++; // Increment missing count if no record exists for this biweekly period
+                        }
+                    }
+                } elseif ($interval == "Monthly") {
+                    $monthsPassed = Carbon::now()->diffInMonths($creationDate);
+
+                    for ($i = 0; $i <= $monthsPassed; $i++) {
+                        $checkDate = $creationDate->copy()->addMonths($i)->startOfMonth();
+                        $found = $records->filter(function ($record, $key) use ($checkDate) {
+                            return Carbon::parse($key)->between($checkDate, $checkDate->copy()->endOfMonth());
+                        });
+                        if ($found->isEmpty()) {
+                            $diff++; // Increment missing count if no record exists for this month
+                        }
+                    }
+                } elseif ($interval == "Quarterly") {
+                    $monthsPassed = Carbon::now()->diffInMonths($creationDate);
+
+                    for ($i = 0; $i <= $monthsPassed; $i += 6) {
+                        $checkDate = $creationDate->copy()->addMonths($i)->startOfMonth();
+                        $found = $records->filter(function ($record, $key) use ($checkDate) {
+                            return Carbon::parse($key)->between($checkDate, $checkDate->copy()->addMonths(5)->endOfMonth());
+                        });
+                        if ($found->isEmpty()) {
+                            $diff++; // Increment missing count if no record exists for this quarter
+                        }
+                    }
+                } elseif ($interval == "Yearly") {
+                    $yearsPassed = Carbon::now()->diffInYears($creationDate);
+
+                    for ($i = 0; $i <= $yearsPassed; $i++) {
+                        $checkDate = $creationDate->copy()->addYears($i)->startOfYear();
+                        $found = $records->filter(function ($record, $key) use ($checkDate) {
+                            return Carbon::parse($key)->between($checkDate, $checkDate->copy()->endOfYear());
+                        });
+                        if ($found->isEmpty()) {
+                            $diff++; // Increment missing count if no record exists for this year
+                        }
+                    }
+                }
+
+                // Add the missing count to the total sum
+                $form->setAttribute('count',$diff);
             }
         }
     	return response()->json(['data'=>$forms]);
@@ -126,6 +223,22 @@ class FormController extends Controller
     	}
     	$form->delete();
     	return response()->json(['message'=>'deleted successfully']);
+    }
+    public function read(Request $request){
+        if(empty($request->json('docId'))||empty($request->json('userId'))){
+            return response()->json([
+                    'message' => 'All fields (userId docId) required',
+                ], 422);
+        }
+        $exists=Read::where('userId',$request->json('userId'))->where('docId',$request->json('docId'))->exists();
+        if($exists==false){
+            $read=new Read;
+            $read->docId=$request->json('docId');
+            $read->userId=$request->json('userId');
+            $read->save();
+        }
+        return response()->json(['message'=>'read successfully']);
+
     }
 
 
