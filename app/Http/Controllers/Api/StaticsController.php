@@ -136,7 +136,7 @@ class StaticsController extends Controller
             $rc=0;
             $docs=Doc::where('static',$sta->id)->get();
             foreach ($docs as $keydd => $valuedd) {
-                $exists=Read::where('docId',$valuedd->docId)->where('userId',$request->json('userId'))->exists();
+                $exists=Read::where('docId',$valuedd->id)->where('userId',$request->json('userId'))->exists();
                 if($exists==false){
                     $rc=$rc+1;
                 }
