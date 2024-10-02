@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use DB;
 use App\Models\Form;
 use App\Models\Node;
-use App\Models\Static;
+use App\Models\Statics;
 class AdminController extends Controller
 {
     /*public function test(){
@@ -60,7 +60,7 @@ class AdminController extends Controller
      public function getStaticDetails(Request $request)
     {
         // Fetch the static record by ID
-        $static = Static::where('id', $request->json('staticId'))->first();
+        $static = Statics::where('id', $request->json('staticId'))->first();
 
         if (!$static) {
             return response()->json(['error' => 'Static not found'], 404);
@@ -92,7 +92,7 @@ class AdminController extends Controller
         }
 
         // Fetch child statics recursively
-        $childStatics = Static::where('parentId', $static->id)->get();
+        $childStatics = Statics::where('parentId', $static->id)->get();
         foreach ($childStatics as $childStatic) {
             $data['children'][] = $this->fetchStaticHierarchy($childStatic);
         }
