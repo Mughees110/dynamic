@@ -17,6 +17,7 @@ return new class extends Migration
             $table->date('date');
             $table->time('time');
             $table->string('userId');
+            $table->date('fill')->nullable();
             $table->timestamps();
         });
     }

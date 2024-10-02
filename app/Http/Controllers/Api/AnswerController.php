@@ -61,11 +61,29 @@ class AnswerController extends Controller
                         'message' => 'All answers (answers (array)) required',
                     ], 422);
                 }
+                $fill=null;
+
+                $form=Form::find($request->json('formId'));
+                if($form->interval=="Daily"){
+                    $latestRecord = Record::where('userId', $request->json('userId'))
+                    ->orderBy('date', 'desc')
+                    ->first();
+                    // Get today's date
+                    $today = Carbon::now()->toDateString();
+                    if ($latestRecord) {
+                        $nextExpectedDate = Carbon::parse($latestRecord->date)->addDay()->toDateString();
+                        if ($nextExpectedDate < $today) {
+                            $fill=$nextExpectedDate;
+                        }
+                    }
+                }
+
                 $record=new Record;
                 $record->formId=$request->json('formId');
                 $record->date=Carbon::now()->toDateString();
                 $record->time=Carbon::now()->toTimeString();
                 $record->userId=$request->json('userId');
+                $record->fill=$fill;
                 $record->save();
                 foreach ($request->json('answersR') as $key => $a) {
                     $answer=new Answer;

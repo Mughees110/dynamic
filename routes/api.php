@@ -38,6 +38,9 @@ Route::get('invalid',function(){
 	 return response()->json(['message'=>'Access token not matched'],422);
 })->name('invalid');
 
+use App\Http\Controllers\AdminController;
+Route::post('/get-static-details', [AdminController::class, 'getStaticDetails'])->middleware('throttle:120,1');
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->middleware('throttle:120,1');
 

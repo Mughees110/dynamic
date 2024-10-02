@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use DB;
 use App\Models\Form;
+use App\Models\Node;
+use App\Models\Static;
 class AdminController extends Controller
 {
     /*public function test(){
@@ -12,7 +14,7 @@ class AdminController extends Controller
     	dd('ok');
     }*/
     public function test(){
-    	DB::statement('ALTER TABLE companies ADD expiryDate date;');
+    	DB::statement('ALTER TABLE records ADD fill date;');
     	dd('hi');
     	DB::statement('ALTER TABLE statics ADD clientId VARCHAR(255);');
     	DB::statement('ALTER TABLE users ADD preference LONGTEXT;');
@@ -53,5 +55,76 @@ class AdminController extends Controller
 		// Output the event ids
 		$eIds=array_unique($eIds);
 		dd($eIds);*/
+    }
+
+     public function getStaticDetails(Request $request)
+    {
+        // Fetch the static record by ID
+        $static = Static::where('id', $request->json('staticId'))->first();
+
+        if (!$static) {
+            return response()->json(['error' => 'Static not found'], 404);
+        }
+
+        // Recursively fetch static hierarchy including nodes and forms
+        $response = $this->fetchStaticHierarchy($static);
+
+        return response()->json($response);
+    }
+
+    private function fetchStaticHierarchy($static)
+    {
+        $data = [
+            'static_id' => $static->id,
+            'static_name' => $static->name,
+            'nodes' => [],
+            'children' => []
+        ];
+
+        // Fetch nodes associated with this static ID that have no parent (top-level nodes)
+        $nodes = Node::where('static', $static->id)
+            ->whereNull('parentId')
+            ->get();
+
+        foreach ($nodes as $node) {
+            // Fetch node hierarchy recursively
+            $data['nodes'][] = $this->fetchNodeHierarchy($node);
+        }
+
+        // Fetch child statics recursively
+        $childStatics = Static::where('parentId', $static->id)->get();
+        foreach ($childStatics as $childStatic) {
+            $data['children'][] = $this->fetchStaticHierarchy($childStatic);
+        }
+
+        return $data;
+    }
+
+    private function fetchNodeHierarchy($node)
+    {
+        // Prepare node data
+        $nodeData = [
+            'node_id' => $node->id,
+            'node_name' => $node->name,
+            'forms' => [],
+            'children' => []
+        ];
+
+        // Fetch forms associated with this node
+        $forms = Form::where('nodeId', $node->id)->get();
+        foreach ($forms as $form) {
+            $nodeData['forms'][] = [
+                'form_id' => $form->id,
+                'form_name' => $form->title
+            ];
+        }
+
+        // Fetch child nodes recursively
+        $childNodes = Node::where('parentId', $node->id)->get();
+        foreach ($childNodes as $childNode) {
+            $nodeData['children'][] = $this->fetchNodeHierarchy($childNode);
+        }
+
+        return $nodeData;
     }
 }
