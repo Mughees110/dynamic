@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use DB;
 use App\Models\Form;
+use App\Models\Field;
 use App\Models\Node;
 use App\Models\Statics;
 class AdminController extends Controller
@@ -115,7 +116,8 @@ class AdminController extends Controller
         foreach ($forms as $form) {
             $nodeData['forms'][] = [
                 'form_id' => $form->id,
-                'form_name' => $form->title
+                'form_name' => $form->title,
+                'fields'=>Field::where('formId',$form->id)->get();
             ];
         }
 

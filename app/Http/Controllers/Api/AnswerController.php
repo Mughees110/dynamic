@@ -77,6 +77,138 @@ class AnswerController extends Controller
                         }
                     }
                 }
+                if($form->interval=="Weekly"){
+                    $latestRecord = Record::where('userId', $request->json('userId'))
+                    ->orderBy('date', 'desc')
+                    ->first();
+                    // Get today's date
+                    $today = Carbon::now()->toDateString();
+                    if ($latestRecord) {
+                        $nextExpectedWeek = Carbon::parse($latestRecord->date)->addWeek()->startOfWeek()->toDateString();
+                        $currentWeekStart = Carbon::now()->startOfWeek()->toDateString();
+                       if ($nextExpectedWeek < $currentWeekStart) {
+                            $fill= $nextExpectedWeek;
+                        }
+                    }
+                }
+                if ($form->interval == "Biweekly") {
+                    $latestRecord = Record::where('userId', $request->json('userId'))
+                        ->orderBy('date', 'desc')
+                        ->first();
+
+                    $currentWeekStart = Carbon::now()->startOfWeek();
+                    $currentWeekEnd = Carbon::now()->endOfWeek();
+                    $missingWeeks = [];
+                    if ($latestRecord) {
+                        $lastSubmissionDate = Carbon::parse($latestRecord->date);
+                        $weeksSinceLastSubmission = $lastSubmissionDate->diffInWeeks(Carbon::now());
+                        // Iterate through the weeks between the last submission and now
+                        for ($i = 1; $i <= $weeksSinceLastSubmission; $i++) {
+                            $weekStart = $lastSubmissionDate->copy()->addWeeks($i)->startOfWeek();
+                            $weekEnd = $lastSubmissionDate->copy()->addWeeks($i)->endOfWeek();
+
+                            $recordsInWeek = Record::where('userId', $request->json('userId'))
+                                ->whereBetween('date', [$weekStart, $weekEnd])
+                                ->count();
+                            if ($recordsInWeek < 2) {
+                                $missingWeeks[] = $weekStart->toDateString(); // Add the start date of the missing week
+                            }
+                        }
+                    }
+                    if (count($missingWeeks) > 0) {
+                        $fill=implode(' ', $missingWeeks);
+                    }
+                }
+                if ($form->interval == "Monthly") {
+                    $latestRecord = Record::where('userId', $request->json('userId'))
+                        ->orderBy('date', 'desc')
+                        ->first();
+
+                    $currentMonthStart = Carbon::now()->startOfMonth();
+                    $currentMonthEnd = Carbon::now()->endOfMonth();
+                    $missingMonths = [];
+                    if ($latestRecord) {
+                        $lastSubmissionDate = Carbon::parse($latestRecord->date);
+
+                        $monthsSinceLastSubmission = $lastSubmissionDate->diffInMonths(Carbon::now());
+
+                        for ($i = 1; $i <= $monthsSinceLastSubmission; $i++) {
+                            $monthStart = $lastSubmissionDate->copy()->addMonths($i)->startOfMonth();
+                            $monthEnd = $lastSubmissionDate->copy()->addMonths($i)->endOfMonth();
+
+                            $recordsInMonth = Record::where('userId', $request->json('userId'))
+                                ->whereBetween('date', [$monthStart, $monthEnd])
+                                ->count();
+
+                            if ($recordsInMonth == 0) {
+                                $missingMonths[] = $monthStart->toDateString(); // Add the start date of the missing month
+                            }
+                        }
+                    }
+                    // Output or return the missing months array
+                    if (count($missingMonths) > 0) {
+                        $fill=implode(' ', $missingMonths);
+                    }
+                }
+                if ($form->interval == "Quarterly") {
+                    $latestRecord = Record::where('userId', $request->json('userId'))
+                        ->orderBy('date', 'desc')
+                        ->first();
+
+                    $currentYear = Carbon::now()->year;
+                    $missingYears = [];
+
+                    if ($latestRecord) {
+                        $lastSubmissionYear = Carbon::parse($latestRecord->date)->year;
+                        $yearsSinceLastSubmission = $currentYear - $lastSubmissionYear;
+
+                        // Iterate through the years between the last submission and now
+                        for ($i = 0; $i <= $yearsSinceLastSubmission; $i++) {
+                            $yearToCheck = $lastSubmissionYear + $i;
+                           // Check how many records exist for the current year being checked
+                            $recordsInYear = Record::where('userId', $request->json('userId'))
+                                ->whereYear('date', $yearToCheck)
+                                ->count();
+                             // If fewer than 2 records are found, consider it missing
+                            if ($recordsInYear < 2) {
+                                $missingYears[] = $yearToCheck; // Add the year to the missing years array
+                            }
+                        }
+                    }
+
+                    if (count($missingYears) > 0) {
+                        $fill = implode(', ', $missingYears); // Join missing years for output
+                    }
+                }
+                if ($form->interval == "Yearly") {
+                    $latestRecord = Record::where('userId', $request->json('userId'))
+                        ->orderBy('date', 'desc')
+                        ->first();
+
+                    $currentYear = Carbon::now()->year;
+                    $missingYears = [];
+
+                    if ($latestRecord) {
+                        $lastSubmissionYear = Carbon::parse($latestRecord->date)->year;
+                        $yearsSinceLastSubmission = $currentYear - $lastSubmissionYear;
+
+                        for ($i = 0; $i <= $yearsSinceLastSubmission; $i++) {
+                            $yearToCheck = $lastSubmissionYear + $i;
+
+                            $recordsInYear = Record::where('userId', $request->json('userId'))
+                                ->whereYear('date', $yearToCheck)
+                                ->count();
+
+                            if ($recordsInYear == 0) {
+                                $missingYears[] = $yearToCheck; // Add the year to the missing years array
+                            }
+                        }
+                    }
+
+                    if (count($missingYears) > 0) {
+                        $fill = implode(', ', $missingYears); // Join missing years for output
+                    }
+                }
 
                 $record=new Record;
                 $record->formId=$request->json('formId');
