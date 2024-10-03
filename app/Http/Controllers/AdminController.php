@@ -114,10 +114,11 @@ class AdminController extends Controller
         // Fetch forms associated with this node
         $forms = Form::where('nodeId', $node->id)->get();
         foreach ($forms as $form) {
+        	$fields=Field::where('formId',$form->id)->get();
             $nodeData['forms'][] = [
                 'form_id' => $form->id,
                 'form_name' => $form->title,
-                'fields'=>Field::where('formId',$form->id)->get();
+                'fields'=>$fields
             ];
         }
 
