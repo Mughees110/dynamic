@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Answer;
 use App\Models\Field;
 use App\Models\Record;
+use App\Models\Form;
 use Input;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
