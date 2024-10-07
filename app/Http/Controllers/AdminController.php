@@ -15,6 +15,8 @@ class AdminController extends Controller
     	dd('ok');
     }*/
     public function test(){
+    	$recs=Record::where('userId',13)->get();
+    	dd($recs);
     	DB::statement('ALTER TABLE records ADD manu date;');
     	dd('hi');
     	DB::statement('ALTER TABLE statics ADD clientId VARCHAR(255);');
