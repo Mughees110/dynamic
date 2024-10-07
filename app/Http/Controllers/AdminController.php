@@ -15,7 +15,7 @@ class AdminController extends Controller
     	dd('ok');
     }*/
     public function test(){
-    	DB::statement('ALTER TABLE records ADD fill date;');
+    	DB::statement('ALTER TABLE records ADD manu date;');
     	dd('hi');
     	DB::statement('ALTER TABLE statics ADD clientId VARCHAR(255);');
     	DB::statement('ALTER TABLE users ADD preference LONGTEXT;');

@@ -63,6 +63,7 @@ class AnswerController extends Controller
                     ], 422);
                 }
                 $fill=null;
+                $manu=Carbon::now()->toDateString();
 
                 $form=Form::find($request->json('formId'));
                 if($form->interval=="Daily"){
@@ -75,6 +76,7 @@ class AnswerController extends Controller
                         $nextExpectedDate = Carbon::parse($latestRecord->date)->addDay()->toDateString();
                         if ($nextExpectedDate < $today) {
                             $fill=$nextExpectedDate;
+                            $manu=$nextExpectedDate;
                         }
                     }
                 }
@@ -89,6 +91,7 @@ class AnswerController extends Controller
                         $currentWeekStart = Carbon::now()->startOfWeek()->toDateString();
                        if ($nextExpectedWeek < $currentWeekStart) {
                             $fill= $nextExpectedWeek;
+                            $manu=$nextExpectedWeek;
                         }
                     }
                 }
@@ -117,6 +120,7 @@ class AnswerController extends Controller
                         }
                     }
                     if (count($missingWeeks) > 0) {
+                        $manu=$missingWeeks[0];
                         $fill=implode(' ', $missingWeeks);
                     }
                 }
@@ -148,6 +152,7 @@ class AnswerController extends Controller
                     }
                     // Output or return the missing months array
                     if (count($missingMonths) > 0) {
+                        $manu=$missingMonths[0];
                         $fill=implode(' ', $missingMonths);
                     }
                 }
@@ -178,6 +183,7 @@ class AnswerController extends Controller
                     }
 
                     if (count($missingYears) > 0) {
+                        $manu=$missingYears[0];
                         $fill = implode(', ', $missingYears); // Join missing years for output
                     }
                 }
@@ -207,6 +213,7 @@ class AnswerController extends Controller
                     }
 
                     if (count($missingYears) > 0) {
+                        $manu=$missingYears[0];
                         $fill = implode(', ', $missingYears); // Join missing years for output
                     }
                 }
@@ -217,6 +224,7 @@ class AnswerController extends Controller
                 $record->time=Carbon::now()->toTimeString();
                 $record->userId=$request->json('userId');
                 $record->fill=$fill;
+                $record->manu=$manu;
                 $record->save();
                 foreach ($request->json('answersR') as $key => $a) {
                     $answer=new Answer;

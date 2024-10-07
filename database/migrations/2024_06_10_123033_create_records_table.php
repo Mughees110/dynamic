@@ -18,6 +18,7 @@ return new class extends Migration
             $table->time('time');
             $table->string('userId');
             $table->date('fill')->nullable();
+            $table->date('manu')->nullable();
             $table->timestamps();
         });
     }
