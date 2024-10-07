@@ -9,6 +9,7 @@ use App\Models\Field;
 use App\Models\Node;
 use App\Models\Statics;
 use App\Models\Record;
+use App\Models\Answer;
 class AdminController extends Controller
 {
     /*public function test(){
@@ -18,9 +19,13 @@ class AdminController extends Controller
     public function test(){
     	$recs=Record::where('userId',13)->get();
     	foreach ($recs as $key => $value) {
-    		
+    		$ans=Answer::where('recordId',$value->id)->get();
+    		foreach ($ans as $key => $value2) {
+    			$value2->delete();
+    		}
+    		$value->delete();
     	}
-    	dd($recs);
+    	dd('hi');
     	DB::statement('ALTER TABLE records ADD manu date;');
     	dd('hi');
     	DB::statement('ALTER TABLE statics ADD clientId VARCHAR(255);');
