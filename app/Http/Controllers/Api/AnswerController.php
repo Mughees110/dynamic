@@ -79,6 +79,10 @@ class AnswerController extends Controller
                             $manu=$nextExpectedDate;
                         }
                     }
+                    if(!$latestRecord){
+                        $fill=Carbon::parse($form->created_at)->toDateString();
+                        $manu=Carbon::parse($form->created_at)->toDateString();
+                    }
                 }
                 if($form->interval=="Weekly"){
                     $latestRecord = Record::where('userId', $request->json('userId'))
@@ -93,6 +97,11 @@ class AnswerController extends Controller
                             $fill= $nextExpectedWeek;
                             $manu=$nextExpectedWeek;
                         }
+
+                    }
+                    if(!$latestRecord){
+                        $fill=Carbon::parse($form->created_at)->toDateString();
+                        $manu=Carbon::parse($form->created_at)->toDateString();
                     }
                 }
                 if ($form->interval == "Biweekly") {
@@ -122,6 +131,10 @@ class AnswerController extends Controller
                     if (count($missingWeeks) > 0) {
                         $manu=$missingWeeks[0];
                         $fill=implode(' ', $missingWeeks);
+                    }
+                    if(!$latestRecord){
+                        $fill=Carbon::parse($form->created_at)->toDateString();
+                        $manu=Carbon::parse($form->created_at)->toDateString();
                     }
                 }
                 if ($form->interval == "Monthly") {
@@ -155,6 +168,10 @@ class AnswerController extends Controller
                         $manu=$missingMonths[0];
                         $fill=implode(' ', $missingMonths);
                     }
+                    if(!$latestRecord){
+                        $fill=Carbon::parse($form->created_at)->toDateString();
+                        $manu=Carbon::parse($form->created_at)->toDateString();
+                    }
                 }
                 if ($form->interval == "Quarterly") {
                     $latestRecord = Record::where('userId', $request->json('userId'))
@@ -186,6 +203,10 @@ class AnswerController extends Controller
                         $manu=$missingYears[0];
                         $fill = implode(', ', $missingYears); // Join missing years for output
                     }
+                    if(!$latestRecord){
+                        $fill=Carbon::parse($form->created_at)->toDateString();
+                        $manu=Carbon::parse($form->created_at)->toDateString();
+                    }
                 }
                 if ($form->interval == "Yearly") {
                     $latestRecord = Record::where('userId', $request->json('userId'))
@@ -215,6 +236,10 @@ class AnswerController extends Controller
                     if (count($missingYears) > 0) {
                         $manu=$missingYears[0];
                         $fill = implode(', ', $missingYears); // Join missing years for output
+                    }
+                    if(!$latestRecord){
+                        $fill=Carbon::parse($form->created_at)->toDateString();
+                        $manu=Carbon::parse($form->created_at)->toDateString();
                     }
                 }
 
