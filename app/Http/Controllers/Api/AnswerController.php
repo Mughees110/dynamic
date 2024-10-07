@@ -68,7 +68,7 @@ class AnswerController extends Controller
                 $form=Form::find($request->json('formId'));
                 if($form->interval=="Daily"){
                     $latestRecord = Record::where('userId', $request->json('userId'))
-                    ->orderBy('date', 'desc')
+                    ->orderBy('manu', 'desc')
                     ->first();
                     // Get today's date
                     $today = Carbon::now()->toDateString();
@@ -86,10 +86,14 @@ class AnswerController extends Controller
                 }
                 if($form->interval=="Weekly"){
                     $latestRecord = Record::where('userId', $request->json('userId'))
-                    ->orderBy('date', 'desc')
+                    ->orderBy('manu', 'desc')
                     ->first();
                     // Get today's date
                     $today = Carbon::now()->toDateString();
+                    if(!$latestRecord){
+                        $fill=Carbon::parse($form->created_at)->toDateString();
+                        $manu=Carbon::parse($form->created_at)->toDateString();
+                    }
                     if ($latestRecord) {
                         $nextExpectedWeek = Carbon::parse($latestRecord->date)->addWeek()->startOfWeek()->toDateString();
                         $currentWeekStart = Carbon::now()->startOfWeek()->toDateString();
@@ -99,19 +103,20 @@ class AnswerController extends Controller
                         }
 
                     }
-                    if(!$latestRecord){
-                        $fill=Carbon::parse($form->created_at)->toDateString();
-                        $manu=Carbon::parse($form->created_at)->toDateString();
-                    }
+                    
                 }
                 if ($form->interval == "Biweekly") {
                     $latestRecord = Record::where('userId', $request->json('userId'))
-                        ->orderBy('date', 'desc')
+                        ->orderBy('manu', 'desc')
                         ->first();
 
                     $currentWeekStart = Carbon::now()->startOfWeek();
                     $currentWeekEnd = Carbon::now()->endOfWeek();
                     $missingWeeks = [];
+                    if(!$latestRecord){
+                        $fill=Carbon::parse($form->created_at)->toDateString();
+                        $manu=Carbon::parse($form->created_at)->toDateString();
+                    }
                     if ($latestRecord) {
                         $lastSubmissionDate = Carbon::parse($latestRecord->date);
                         $weeksSinceLastSubmission = $lastSubmissionDate->diffInWeeks(Carbon::now());
@@ -132,19 +137,20 @@ class AnswerController extends Controller
                         $manu=$missingWeeks[0];
                         $fill=implode(' ', $missingWeeks);
                     }
-                    if(!$latestRecord){
-                        $fill=Carbon::parse($form->created_at)->toDateString();
-                        $manu=Carbon::parse($form->created_at)->toDateString();
-                    }
+                    
                 }
                 if ($form->interval == "Monthly") {
                     $latestRecord = Record::where('userId', $request->json('userId'))
-                        ->orderBy('date', 'desc')
+                        ->orderBy('manu', 'desc')
                         ->first();
 
                     $currentMonthStart = Carbon::now()->startOfMonth();
                     $currentMonthEnd = Carbon::now()->endOfMonth();
                     $missingMonths = [];
+                    if(!$latestRecord){
+                        $fill=Carbon::parse($form->created_at)->toDateString();
+                        $manu=Carbon::parse($form->created_at)->toDateString();
+                    }
                     if ($latestRecord) {
                         $lastSubmissionDate = Carbon::parse($latestRecord->date);
 
@@ -168,18 +174,20 @@ class AnswerController extends Controller
                         $manu=$missingMonths[0];
                         $fill=implode(' ', $missingMonths);
                     }
-                    if(!$latestRecord){
-                        $fill=Carbon::parse($form->created_at)->toDateString();
-                        $manu=Carbon::parse($form->created_at)->toDateString();
-                    }
+                    
                 }
                 if ($form->interval == "Quarterly") {
                     $latestRecord = Record::where('userId', $request->json('userId'))
-                        ->orderBy('date', 'desc')
+                        ->orderBy('manu', 'desc')
                         ->first();
 
                     $currentYear = Carbon::now()->year;
                     $missingYears = [];
+
+                    if(!$latestRecord){
+                        $fill=Carbon::parse($form->created_at)->toDateString();
+                        $manu=Carbon::parse($form->created_at)->toDateString();
+                    }
 
                     if ($latestRecord) {
                         $lastSubmissionYear = Carbon::parse($latestRecord->date)->year;
@@ -203,19 +211,19 @@ class AnswerController extends Controller
                         $manu=$missingYears[0];
                         $fill = implode(', ', $missingYears); // Join missing years for output
                     }
-                    if(!$latestRecord){
-                        $fill=Carbon::parse($form->created_at)->toDateString();
-                        $manu=Carbon::parse($form->created_at)->toDateString();
-                    }
+                    
                 }
                 if ($form->interval == "Yearly") {
                     $latestRecord = Record::where('userId', $request->json('userId'))
-                        ->orderBy('date', 'desc')
+                        ->orderBy('manu', 'desc')
                         ->first();
 
                     $currentYear = Carbon::now()->year;
                     $missingYears = [];
-
+                    if(!$latestRecord){
+                        $fill=Carbon::parse($form->created_at)->toDateString();
+                        $manu=Carbon::parse($form->created_at)->toDateString();
+                    }
                     if ($latestRecord) {
                         $lastSubmissionYear = Carbon::parse($latestRecord->date)->year;
                         $yearsSinceLastSubmission = $currentYear - $lastSubmissionYear;
@@ -237,10 +245,7 @@ class AnswerController extends Controller
                         $manu=$missingYears[0];
                         $fill = implode(', ', $missingYears); // Join missing years for output
                     }
-                    if(!$latestRecord){
-                        $fill=Carbon::parse($form->created_at)->toDateString();
-                        $manu=Carbon::parse($form->created_at)->toDateString();
-                    }
+
                 }
 
                 $record=new Record;
