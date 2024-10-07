@@ -40,10 +40,10 @@ class FormController extends Controller
                 // Retrieve all the user's records for this form, grouped by date
                 $records = Record::where('userId', $request->json('userId'))
                                 ->where('formId', $form->id)
-                                ->select('created_at')
+                                ->select('manu')
                                 ->get()
                                 ->groupBy(function($record) {
-                                    return Carbon::parse($record->created_at)->startOfDay()->toDateString();
+                                    return Carbon::parse($record->manu)->startOfDay()->toDateString();
                                 });
 
                 // Calculate occurrences based on the interval
