@@ -18,14 +18,14 @@ class AdminController extends Controller
     }*/
     public function test(){
     	$recs=Record::where('userId',13)->get();
-    	foreach ($recs as $key => $value) {
+    	/*foreach ($recs as $key => $value) {
     		$ans=Answer::where('recordId',$value->id)->get();
     		foreach ($ans as $key => $value2) {
     			$value2->delete();
     		}
     		$value->delete();
-    	}
-    	dd('hi');
+    	}*/
+    	dd($recs);
     	DB::statement('ALTER TABLE records ADD manu date;');
     	dd('hi');
     	DB::statement('ALTER TABLE statics ADD clientId VARCHAR(255);');
