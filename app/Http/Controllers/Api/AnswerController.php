@@ -73,7 +73,7 @@ class AnswerController extends Controller
                     // Get today's date
                     $today = Carbon::now()->toDateString();
                     if ($latestRecord) {
-                        $nextExpectedDate = Carbon::parse($latestRecord->date)->addDay()->toDateString();
+                        $nextExpectedDate = Carbon::parse($latestRecord->manu)->addDay()->toDateString();
                         if ($nextExpectedDate < $today) {
                             $fill=$nextExpectedDate;
                             $manu=$nextExpectedDate;
@@ -95,7 +95,7 @@ class AnswerController extends Controller
                         $manu=Carbon::parse($form->created_at)->toDateString();
                     }
                     if ($latestRecord) {
-                        $nextExpectedWeek = Carbon::parse($latestRecord->date)->addWeek()->startOfWeek()->toDateString();
+                        $nextExpectedWeek = Carbon::parse($latestRecord->manu)->addWeek()->startOfWeek()->toDateString();
                         $currentWeekStart = Carbon::now()->startOfWeek()->toDateString();
                        if ($nextExpectedWeek < $currentWeekStart) {
                             $fill= $nextExpectedWeek;
@@ -118,7 +118,7 @@ class AnswerController extends Controller
                         $manu=Carbon::parse($form->created_at)->toDateString();
                     }
                     if ($latestRecord) {
-                        $lastSubmissionDate = Carbon::parse($latestRecord->date);
+                        $lastSubmissionDate = Carbon::parse($latestRecord->manu);
                         $weeksSinceLastSubmission = $lastSubmissionDate->diffInWeeks(Carbon::now());
                         // Iterate through the weeks between the last submission and now
                         for ($i = 1; $i <= $weeksSinceLastSubmission; $i++) {
@@ -126,7 +126,7 @@ class AnswerController extends Controller
                             $weekEnd = $lastSubmissionDate->copy()->addWeeks($i)->endOfWeek();
 
                             $recordsInWeek = Record::where('userId', $request->json('userId'))
-                                ->whereBetween('date', [$weekStart, $weekEnd])
+                                ->whereBetween('manu', [$weekStart, $weekEnd])
                                 ->count();
                             if ($recordsInWeek < 2) {
                                 $missingWeeks[] = $weekStart->toDateString(); // Add the start date of the missing week
@@ -152,7 +152,7 @@ class AnswerController extends Controller
                         $manu=Carbon::parse($form->created_at)->toDateString();
                     }
                     if ($latestRecord) {
-                        $lastSubmissionDate = Carbon::parse($latestRecord->date);
+                        $lastSubmissionDate = Carbon::parse($latestRecord->manu);
 
                         $monthsSinceLastSubmission = $lastSubmissionDate->diffInMonths(Carbon::now());
 
@@ -161,7 +161,7 @@ class AnswerController extends Controller
                             $monthEnd = $lastSubmissionDate->copy()->addMonths($i)->endOfMonth();
 
                             $recordsInMonth = Record::where('userId', $request->json('userId'))
-                                ->whereBetween('date', [$monthStart, $monthEnd])
+                                ->whereBetween('manu', [$monthStart, $monthEnd])
                                 ->count();
 
                             if ($recordsInMonth == 0) {
@@ -190,7 +190,7 @@ class AnswerController extends Controller
                     }
 
                     if ($latestRecord) {
-                        $lastSubmissionYear = Carbon::parse($latestRecord->date)->year;
+                        $lastSubmissionYear = Carbon::parse($latestRecord->manu)->year;
                         $yearsSinceLastSubmission = $currentYear - $lastSubmissionYear;
 
                         // Iterate through the years between the last submission and now
@@ -198,7 +198,7 @@ class AnswerController extends Controller
                             $yearToCheck = $lastSubmissionYear + $i;
                            // Check how many records exist for the current year being checked
                             $recordsInYear = Record::where('userId', $request->json('userId'))
-                                ->whereYear('date', $yearToCheck)
+                                ->whereYear('manu', $yearToCheck)
                                 ->count();
                              // If fewer than 2 records are found, consider it missing
                             if ($recordsInYear < 2) {
@@ -225,14 +225,14 @@ class AnswerController extends Controller
                         $manu=Carbon::parse($form->created_at)->toDateString();
                     }
                     if ($latestRecord) {
-                        $lastSubmissionYear = Carbon::parse($latestRecord->date)->year;
+                        $lastSubmissionYear = Carbon::parse($latestRecord->manu)->year;
                         $yearsSinceLastSubmission = $currentYear - $lastSubmissionYear;
 
                         for ($i = 0; $i <= $yearsSinceLastSubmission; $i++) {
                             $yearToCheck = $lastSubmissionYear + $i;
 
                             $recordsInYear = Record::where('userId', $request->json('userId'))
-                                ->whereYear('date', $yearToCheck)
+                                ->whereYear('manu', $yearToCheck)
                                 ->count();
 
                             if ($recordsInYear == 0) {
