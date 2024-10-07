@@ -8,6 +8,7 @@ use App\Models\Form;
 use App\Models\Field;
 use App\Models\Node;
 use App\Models\Statics;
+use App\Models\Record;
 class AdminController extends Controller
 {
     /*public function test(){
